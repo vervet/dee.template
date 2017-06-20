@@ -6,6 +6,14 @@ HTML模板引擎
 3. 从文件加载模板
 4. <include >html标签的支持
 
+
+## 安装
+
+```
+  npm install dee.template
+  
+```
+
 # 用法1. 根据页面内嵌节点作为模板
 模板代码 (将模板放在当前代码页面)
 ```html
