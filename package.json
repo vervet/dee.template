@@ -1,0 +1,84 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "dee.template",
+        "scope": null,
+        "escapedName": "dee.template",
+        "name": "dee.wang",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "D:\\wechat_service2.0"
+    ]
+  ],
+  "_from": "dee.wang@latest",
+  "_id": "dee.wang@1.0.0",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/dee.wang",
+  "_nodeVersion": "6.10.3",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/dee.wang-1.0.0.tgz_1497932532512_0.20332122594118118"
+  },
+  "_npmUser": {
+    "name": "dee.wang",
+    "email": "392849447@qq.com"
+  },
+  "_npmVersion": "3.10.10",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "dee.wang",
+    "scope": null,
+    "escapedName": "dee.wang",
+    "name": "dee.wang",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/dee.wang/-/dee.wang-1.0.0.tgz",
+  "_shasum": "dfd56daf01ca5e8936207577ca90b6a93fafd4e6",
+  "_shrinkwrap": null,
+  "_spec": "dee.wang",
+  "_where": "D:\\wechat_service2.0",
+  "author": {
+    "name": "dee.wang"
+  },
+  "dependencies": {},
+  "description": "Template for HTML/JS",
+  "devDependencies": {},
+  "directories": {},
+  "dist": {
+    "shasum": "dfd56daf01ca5e8936207577ca90b6a93fafd4e6",
+    "tarball": "https://registry.npmjs.org/dee.wang/-/dee.template-1.0.1.tgz"
+  },
+  "keywords": [
+    "Template",
+    "HTML",
+    "javascript"
+  ],
+  "license": "ISC",
+  "main": "template.js",
+  "maintainers": [
+    {
+      "name": "dee.wang",
+      "email": "392849447@qq.com"
+    }
+  ],
+  "name": "dee.template",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vervet/dee.template"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.1"
+}
