@@ -10,7 +10,7 @@ HTML模板引擎
 ## 安装
 
 ```
-  npm install dee.template
+  npm install dee-template
   
 ```
 
