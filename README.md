@@ -30,6 +30,7 @@ HTML模板引擎
 ```
 用法
 ```js
+  require("dee-template");
   var data ={
       date:'2017-06-02',
       name:'Allen,Ding',
@@ -68,6 +69,7 @@ type='text/plain' style='disply:none'></object>
 ```
 用法：
 ```js
+ require("dee-template");
   var data ={
       date:'2017-06-02',
       name:'Allen,Ding',
@@ -102,6 +104,7 @@ type='text/plain' style='disply:none'></object>
 ```
 主界面js用法：
 ```js
+  require("dee-template");
   var data ={
       date:'2017-06-02',
       name:'Allen,Ding',
