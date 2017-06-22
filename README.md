@@ -119,7 +119,7 @@ type='text/plain' style='disply:none'></object>
   
 ```
 
-# 4. <include >html标签的支持(html文件引用)
+# 4.  include  标签的支持(html文件引用)
 
  
 > 本方法适用于HTML的模块化
@@ -155,7 +155,7 @@ type='text/plain' style='disply:none'></object>
 ```js
  无
 ```
-**include标签的属性**：
+### include标签的属性 
 属性 | 说明
 ---|---
 src | 所嵌入的html代码所在文件名
@@ -167,16 +167,18 @@ script| 需要执行的代码 (书写规则另见)
 如果一个模板文件 有多个子模板节点被使用，
 可以参考include功能的举例2，先将模板文件实例化，再分别使用各子模板
 
-** 支持循环嵌套 **
+
+### 支持循环嵌套
 
 include 支持循环嵌套
 
-** 支持循环嵌套 **
+### 支持运行js代码
+
 include 内嵌代码书写规则举例
 ```js
 class MyModule  {
   constructor($) { 
-       VIP.$=$;
+       MyModule.$=$;
        //  $选中的节点，为局部HTML模块的节点
        var name = $('#username').html(); 
   }
@@ -206,6 +208,7 @@ Template.activeInclude(
 ```
 
 
+# Thank you!
 
 > 联系方式
 ```js
