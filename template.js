@@ -125,27 +125,49 @@ class TemplateFromFile {
 	}
 
 }
+//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv include 功能 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-var HTMLinclude = () => {
+var HTMLinclude = (scope) => {
 
-	for (var i = 0; i < $('include').length; i++) {
-		var ele = $('include').eq(i);
+	for (var i = 0; i < $('include', scope).length; i++) {
+		var ele = $('include', scope).eq(i);
 		var filepath = ele.attr('src');
 		var fileid = ele.attr('module');
 		var sel = ele.attr('node');
 		var data = ele.attr('data');
+		var script = ele.attr('script');
 
 		if (!fileid) fileid = 'i_' + Math.random();
 
 		if (!HTMLinclude.maker[fileid]) {
-			var fileurl = `${path.join(window.VIEWROOT, filepath)}`;
+			let fileurl = `${path.join(window.VIEWROOT, filepath)}`;
 
 			HTMLinclude.maker[fileid] = new TemplateFromFile(fileurl);
 		}
 
 
 		if (sel) {
-			ele.get(0).outerHTML = HTMLinclude.maker[fileid].template('#' + sel, data);
+			var html = HTMLinclude.maker[fileid].template('#' + sel, data);
+			if (!script) {
+				ele.get(0).outerHTML = html;
+			} else {
+				var moduleID = ('M' + Math.random()).replace('0.', '');
+				ele.get(0).outerHTML = `<MODULE id='${moduleID}'>${html}</MODULE>`;
+
+				let fileurl = `${path.join(window.ROOT, script)}`;
+
+				var localScript = require(fileurl);
+
+
+				new localScript(function(a) {
+					return window.$(a, $('#' + moduleID));
+				});
+
+
+			}
+			//execute script first OR fill html ?
+			Template.HTMLinclude(document);
+
 		}
 
 	}
@@ -153,16 +175,56 @@ var HTMLinclude = () => {
 };
 HTMLinclude.maker = [];
 
+
+//！！在多实例情况下， 限制include代码对内部HTML节点作用域范围 
+class IncludeBaseScript {
+	constructor(data) {
+		this.scope = data;
+		this.$ = (a) => {
+			return window.$(a, this.scope)
+		};
+	}
+}
+
+Template.include = IncludeBaseScript;
+
+/*
+用法： 
+const Template = require('dee-template');
+
+class VIP extends Template.include{
+	constructor(scope) {
+	   super(scope); //IMPORTANT
+       
+       alert( this.$('#tab_7').html() );
+		//window.$
+	}
+}
+module.exports = VIP;
+*/
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
 //激活HTML里的include标签
 Template.HTMLinclude = HTMLinclude;
 //使用<object src='xxxx.html'> 方法获取魔板
 Template.fromEmbededObject = FromEbededObject;
 //使用文件系统里的文件作为魔板
 Template.fromFile = TemplateFromFile;
-Template.activeInclude = ()=>{console.log('the function [activeInclude] is not ready yet!')}
+Template.activeInclude = () => {
+	console.log('the function [activeInclude] is not ready yet!')
+}
 
 //window.addEventListener('load',function(){ console.log('window.onload'); });
-document.addEventListener('DOMContentLoaded',function(){console.log('document.ready') ; Template.HTMLinclude()});
+
+if (!Template.isLoad) {
+	document.addEventListener('DOMContentLoaded', function() {
+		console.log('document.ready');
+		Template.HTMLinclude(document);
+	});
+}
+Template.isLoad = true;
 //Template.HTMLinclude();
 
 module.exports = Template;
