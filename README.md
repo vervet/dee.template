@@ -4,7 +4,7 @@ HTML模板引擎
 1. 根据页面内嵌节点作为模板
 2. 根据嵌入式代码文件作为模板
 3. 从文件加载模板
-4. <include >html标签的支持
+4. include标签的支持(页面嵌套)
 
 
 ## 安装
@@ -123,7 +123,7 @@ type='text/plain' style='disply:none'></object>
 
  
 > 本方法适用于HTML的模块化
-
+，本功能特别适合于大型项目，进行模块划分
  
 
 
@@ -178,7 +178,7 @@ include 内嵌代码书写规则举例
 ```js
 class MyModule  {
   constructor($) { 
-       MyModule.$=$;
+       this.$=$;
        //  $选中的节点，为局部HTML模块的节点
        var name = $('#username').html(); 
   }
