@@ -118,8 +118,11 @@ class TemplateFromFile {
 		this.templateObj = $("<div>" + html + "</div>");
 
 	}
+	getOrignalHtml(sel) {
+		return this.templateObj.find(sel).prop('innerHTML') + "";
+	}
 	template(sel, jsonData) {
-		var text = this.templateObj.find(sel).prop('innerHTML') + "";
+		var text = this.getOrignalHtml(sel);
 		//var text = this.templateObj.find(sel).text();
 		return Template.applyData(text, jsonData);
 	}
@@ -147,7 +150,24 @@ var HTMLinclude = (scope) => {
 
 
 		if (sel) {
-			var html = HTMLinclude.maker[fileid].template('#' + sel, data);
+			var html = '';
+
+			if (data) {
+
+				try {
+					html = HTMLinclude.maker[fileid].template('#' + sel, data);
+
+				} catch (e) {
+					console.error(e);
+					console.error(data);
+				}
+
+			} else {
+				html = HTMLinclude.maker[fileid].getOrignalHtml('#' + sel);
+			}
+
+
+
 			if (!script) {
 				ele.get(0).outerHTML = html;
 			} else {
