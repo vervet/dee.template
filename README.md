@@ -23,6 +23,7 @@ HTML模板引擎
    照片:<img src='${body.photo}'>
    体重:<span>${body.weight}</span>
    身高:<span>${body.length}</span>
+   
 </TEXTAREA>
 
 <div id='babyInformation'>
@@ -62,6 +63,14 @@ type='text/plain' style='disply:none'></object>
    照片:<img src='${body.photo}'>
    体重:<span>${body.weight}</span>
    身高:<span>${body.length}</span>
+    <% 
+        for(var i =0; i < 5; i++)
+        {
+    %>
+        ${i} is <%=i %> 
+     <%
+        }
+    %>
 </TEXTAREA>
 <TEXTAREA id='tpl_2'>
 .....
@@ -90,6 +99,7 @@ type='text/plain' style='disply:none'></object>
  无
 ```
 模板文件 include.inc.html代码:
+
 ```html
 <div id='tpl_1'>
    日期:<span>${date}</span>
@@ -97,6 +107,14 @@ type='text/plain' style='disply:none'></object>
    照片:<img src='${body.photo}'>
    体重:<span>${body.weight}</span>
    身高:<span>${body.length}</span>
+    <% 
+        for(var i =0; i < 5; i++)
+        {
+    %>
+        ${i} is <%=i %> 
+     <%
+        }
+    %>
 </div>
 <div id='tpl_2'>
 ...
