@@ -62,6 +62,51 @@ class Template {
 		return eval(tmpl);
 
 	}
+
+	static applyDataAdv(template, data) {
+		var compiledScript = Template.compile(template);
+		//console.log(compiledScript);
+		var parse = eval(compiledScript);
+		return parse(data);
+	}
+
+	static makeCode() {
+
+
+	}
+	static compile(template) {
+		//意外地被jquery转化了
+
+		template = template.replace(/&lt;/gm, '<')
+			.replace(/&gt;/gm, '>');
+
+
+		var evalExpr = /<%=(.+?)%>/g;
+		var expr = /<%([\s\S]+?)%>/g;
+
+		template = template
+			.replace(evalExpr, '`); \n  echo( $1 ); \n  echo(`')
+			.replace(expr, '`); \n $1 \n  echo(`');
+
+		console.log(template);
+
+		template = 'echo(`' + template + '`);';
+
+		var script =
+			`(function parse(data){
+			    var output = "";
+
+			    function echo(html){
+			      output += html;
+			    }
+
+			    ${ template }
+
+			    return output;
+			  })`;
+
+		return script;
+	}
 	static applyData10(tplTxt, data) { /*1.0未完善*/
 		for (var key in data) {
 			var value = data[key];
@@ -98,7 +143,7 @@ class FromEbededObject {
 		//获取html并给魔板内变量赋值 
 	template(sel, json) {
 		var html = this.element(sel);
-		return Template.applyData(html, json);
+		return Template.applyDataAdv(html, json);
 	}
 
 
@@ -118,10 +163,13 @@ class TemplateFromFile {
 		this.templateObj = $("<div>" + html + "</div>");
 
 	}
+	getOrignalHtml(sel) {
+		return this.templateObj.find(sel).prop('innerHTML') + "";
+	}
 	template(sel, jsonData) {
-		var text = this.templateObj.find(sel).prop('innerHTML') + "";
+		var text = this.getOrignalHtml(sel);
 		//var text = this.templateObj.find(sel).text();
-		return Template.applyData(text, jsonData);
+		return Template.applyDataAdv(text, jsonData);
 	}
 
 }
@@ -147,7 +195,24 @@ var HTMLinclude = (scope) => {
 
 
 		if (sel) {
-			var html = HTMLinclude.maker[fileid].template('#' + sel, data);
+			var html = '';
+
+			if (data) {
+
+				try {
+					html = HTMLinclude.maker[fileid].template('#' + sel, data);
+
+				} catch (e) {
+					console.error(e);
+					console.error(data);
+				}
+
+			} else {
+				html = HTMLinclude.maker[fileid].getOrignalHtml('#' + sel);
+			}
+
+
+
 			if (!script) {
 				ele.get(0).outerHTML = html;
 			} else {

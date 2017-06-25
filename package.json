@@ -55,7 +55,7 @@
   "directories": {},
   "dist": {
     "shasum": "dfd56daf01ca5e8936207577ca90b6a93fafd4e6",
-    "tarball": "https://registry.npmjs.org/dee.wang/-/dee-template-1.0.1.tgz"
+    "tarball": "https://registry.npmjs.org/dee.wang/-/dee-template-1.5.0.tgz"
   },
   "keywords": [
     "Template",
@@ -80,5 +80,5 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.0.1"
+  "version": "1.5.0"
 }
