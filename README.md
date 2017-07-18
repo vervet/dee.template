@@ -199,7 +199,13 @@ class MyModule  {
        this.$=$;
        //  $选中的节点，为局部HTML模块的节点
        var name = $('#username').html(); 
+       //调用老代码
+       callOldCode($); 
   }
+  function callOldCode($){
+     //all my old code
+     //所有在使用模块化之前的老代码
+  }
     
 } 
 module.exports = MyModule;
