@@ -202,12 +202,13 @@ class MyModule  {
        //调用老代码
        callOldCode($); 
   }
-  function callOldCode($){
+}
+function callOldCode($){
      //all my old code
      //所有在使用模块化之前的老代码
-  }
+}
     
-} 
+ 
 module.exports = MyModule;
 ```
 
