@@ -8,6 +8,10 @@
 const http = require('http');
 var FS = require("fs");
 const path = require('path');
+if (typeof(window.$) == 'undefined') {
+	console.error('%c $ jquery  is not ready!!!!!', 'font-size:20pt');
+	return;
+}
 
 class Template {
 	constructor() {
@@ -86,9 +90,10 @@ class Template {
 
 		template = template
 			.replace(evalExpr, '`); \n  echo( $1 ); \n  echo(`')
-			.replace(expr, '`); \n $1 \n  echo(`');
+			.replace(expr, '`); \n $1 \n  echo(`')
+			.replace(/\$\{(.+?)\}/g, "\${data\.$1\}"); //替换旧格式
 
-		console.log(template);
+		//console.log(template);
 
 		template = 'echo(`' + template + '`);';
 
