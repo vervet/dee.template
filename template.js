@@ -34,28 +34,30 @@ class Template {
 		* **/
 
 	static makeNode(tplSel, jsonData) {
-			//TODO   html模板
-			var html = $(tplSel).text();
-			//html = "<div>"+html+"</div>";
-			html = Template.applyData(html, jsonData);
+		//TODO   html模板
+		var html = $(tplSel).text();
+		//html = "<div>"+html+"</div>";
+		html = Template.applyData(html, jsonData);
 
-			return $(html);
+		return $(html);
 
-		}
-		/**
-		将某魔板应用上数据，生成html，并append到某节点上
-		**/
+	}
+
+
+	/**
+	将某魔板应用上数据，生成html，并append到某节点上
+	**/
 	static makeNodeTo(tplSel, jsonData, applySel) {
-			$(applySel).append(Template.makeNode(tplSel, jsonData));
+		$(applySel).append(Template.makeNode(tplSel, jsonData));
 
-		}
-		//20170509 新增  反向模板
+	}
+
 	static makeToNode(tplSel, jsonData, applySel) {
-			$(applySel).prepend(Template.makeNode(tplSel, jsonData));
-			//		prepend
+		$(applySel).prepend(Template.makeNode(tplSel, jsonData));
+		//		prepend
 
-		}
-		//data={x:100}
+	}
+
 	static applyData(tplTxt, data) {
 		if (typeof(Map) == 'undefined') {
 			return Template.applyData10(tplTxt, data);
@@ -182,8 +184,8 @@ class TemplateFromFile {
 
 var HTMLinclude = (scope) => {
 
-	for (var i = 0; i < $('include', scope).length; i++) {
-		var ele = $('include', scope).eq(i);
+	for (var i = 0; i < $("include[loaded!='yes']", scope).length; i++) {
+		var ele = $("include[loaded!='yes']", scope).eq(i);
 		var filepath = ele.attr('src');
 		var fileid = ele.attr('module');
 		var sel = ele.attr('node');
@@ -217,20 +219,28 @@ var HTMLinclude = (scope) => {
 			}
 
 
-
+			var oldNode = ele.get(0);
 			if (!script) {
-				ele.get(0).outerHTML = html;
+				oldNode.outerHTML = html;
 			} else {
 				var moduleID = ('M' + Math.random()).replace('0.', '');
-				ele.get(0).outerHTML = `<MODULE id='${moduleID}'>${html}</MODULE>`;
+				if (!oldNode.id) {
+					oldNode.id = moduleID;
+				}else{
+					moduleID = oldNode.id ;
+				}
+				oldNode.innerHTML = html;
+
+				oldNode.setAttribute('loaded', 'yes');
+
 
 				let fileurl = `${path.join(window.ROOT, script)}`;
 
 				var localScript = require(fileurl);
 
 
-				new localScript(function(a) {
-					return window.$(a, $('#' + moduleID));
+				oldNode.runtime = new localScript(function(a) {
+					return window.$(a, window.$('#' + moduleID));
 				});
 
 

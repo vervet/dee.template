@@ -199,10 +199,26 @@ class MyModule  {
        this.$=$;
        //  $选中的节点，为局部HTML模块的节点
        var name = $('#username').html(); 
+       myOldCode($);
+  }
+  publicMethod (){
+     //公开的函数
+     //方法方法，见下文
   }
     
 } 
+function myOldCode($){
+    //all my old code
+}
 module.exports = MyModule;
+
+```
+
+```js
+
+$('include')[0].runtime.publicMethod();
+//访问节点的类实例的函数
+
 ```
 
 **data应用：**
