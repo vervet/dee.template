@@ -14,7 +14,7 @@ HTML模板引擎
   
 ```
 
-# 用法1. 根据页面内嵌节点作为模板
+# 用法1. 根据页面内嵌节点作为模板 
 模板代码 (将模板放在当前代码页面)
 ```html
 <TEXTAREA id='tpl_1' style='display:none'>
@@ -89,11 +89,14 @@ type='text/plain' style='disply:none'></object>
   }
   var maker = Template.fromEmbededObject('#obj_1');
   var html = maker.template('#tpl_1', data);
-   
   
 ```
 
-# 用法3. 从文件加载模板
+
+# 用法3. 从文件加载模板（node）
+
+>（依赖 FS 组件，只适合于nodeJs环境）
+
 主页面代码:
 ```html
  无
@@ -139,16 +142,16 @@ type='text/plain' style='disply:none'></object>
 
 # 4.  include  标签的支持(html文件引用)
 
- 
 > 本方法适用于HTML的模块化
 ，本功能特别适合于大型项目，进行模块划分
+include 功能的深度嵌入
  
 
 
 主界面代码，
 举例1
 ```html
-<INCLUDE node='tpl_1' src='include.inc.html'></INCLUDE>
+<INCLUDE node='tpl_1' src='include.inc.html' script='hello.js'></INCLUDE>
 ```
 举例2
 ```html
@@ -203,9 +206,8 @@ class MyModule  {
   }
   publicMethod (){
      //公开的函数
-     //方法方法，见下文
+     //使用方法，见下文
   }
-    
 } 
 function myOldCode($){
     //all my old code
@@ -222,10 +224,9 @@ $('include')[0].runtime.publicMethod();
 ```
 
 **data应用：**
-没有node值的include标签不会被替换，
-事后设置也不会被替换
+> 没有node值的include标签不会被实例化，
 可以为该节点设置 node, data, module,甚至src 后，
-使用includeActive方法，激活该标签
+使用activeInclude方法，动态激活该标签
 ```html
 <include id='inc_1'> </include>
 ```
@@ -244,10 +245,4 @@ Template.activeInclude(
 
 # Thank you!
 
-> 联系方式
-```js
-{
- "name": "dee.wang",
- "email": "392849447@qq.com"
-}
-```
+ 
