@@ -158,14 +158,20 @@ class FromEbededObject {
 
 
 class TemplateFromFile {
-	constructor(filepath, callback) {
-		this.readfile(filepath, callback);
+	constructor(filepath, code) {
+		this.code = code;
+		this.readfile(filepath);
 
 	}
-	readfile(filepath, callback) {
+	readfile(filepath) {
+		var html = '';
+		if (!FS.existsSync(filepath)) {
+			console.error("[dee-template]file not exists: " + filepath);
+			console.log(this.code);
+		} else {
+			html = FS.readFileSync(filepath, "utf-8");
+		}
 
-		//ajax 
-		var html = FS.readFileSync(filepath, "utf-8");
 
 		this.templateObj = $("<div>" + html + "</div>");
 
@@ -182,10 +188,14 @@ class TemplateFromFile {
 }
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv include 功能 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-var HTMLinclude = (scope) => {
+var HTMLinclude = (scope, basedir0) => {
 
-	for (var i = 0; i < $("include[loaded!='yes']", scope).length; i++) {
-		var ele = $("include[loaded!='yes']", scope).eq(i);
+	var basedir = path.dirname(basedir0.replace('file://', ''));
+
+	var selAll = $("include[loaded!='yes']", scope);
+	var selCount = selAll.length;
+	for (var i = 0; i < selCount; i++) {
+		var ele = selAll.eq(i);
 		var filepath = ele.attr('src');
 		var fileid = ele.attr('module');
 		var sel = ele.attr('node');
@@ -194,61 +204,61 @@ var HTMLinclude = (scope) => {
 
 		if (!fileid) fileid = 'i_' + Math.random();
 
+		var fileurl = '';
 		if (!HTMLinclude.maker[fileid]) {
-			let fileurl = `${path.join(window.VIEWROOT, filepath)}`;
+			if (!filepath) {
+				console.log((ele[0].outerHTML));
+			}
 
-			HTMLinclude.maker[fileid] = new TemplateFromFile(fileurl);
+			fileurl = path.join(basedir, filepath);
+
+			HTMLinclude.maker[fileid] = new TemplateFromFile(fileurl, (ele[0].outerHTML).trim());
 		}
 
 
-		if (sel) {
-			var html = '';
+		if (!sel) {
+			continue;
+		}
 
-			if (data) {
+		var html = '';
+		if (data) {
+			try {
+				html = HTMLinclude.maker[fileid].template('#' + sel, data);
+			} catch (e) {
+				console.error(e);
+				console.error(data);
+			}
+		} else {
+			html = HTMLinclude.maker[fileid].getOrignalHtml('#' + sel);
+		}
 
-				try {
-					html = HTMLinclude.maker[fileid].template('#' + sel, data);
 
-				} catch (e) {
-					console.error(e);
-					console.error(data);
-				}
+		var oldNode = ele.get(0);
+		oldNode.innerHTML = html;
+		oldNode.setAttribute('loaded', 'yes');
 
+		if (script) {
+			var moduleID = ('M' + Math.random()).replace('0.', '');
+			if (!oldNode.id) {
+				oldNode.id = moduleID;
 			} else {
-				html = HTMLinclude.maker[fileid].getOrignalHtml('#' + sel);
+				moduleID = oldNode.id;
 			}
 
+			let jsurl = path.join(basedir, script);
 
-			var oldNode = ele.get(0);
-			if (!script) {
-				oldNode.outerHTML = html;
-			} else {
-				var moduleID = ('M' + Math.random()).replace('0.', '');
-				if (!oldNode.id) {
-					oldNode.id = moduleID;
-				}else{
-					moduleID = oldNode.id ;
-				}
-				oldNode.innerHTML = html;
+			var localScript = require(jsurl);
 
-				oldNode.setAttribute('loaded', 'yes');
-
-
-				let fileurl = `${path.join(window.ROOT, script)}`;
-
-				var localScript = require(fileurl);
-
-
-				oldNode.runtime = new localScript(function(a) {
-					return window.$(a, window.$('#' + moduleID));
-				});
-
-
-			}
-			//execute script first OR fill html ?
-			Template.HTMLinclude(document);
+			oldNode.runtime = new localScript(function(a) {
+				return window.$(a, window.$('#' + moduleID));
+			});
 
 		}
+
+		//execute script first OR fill html ?
+		Template.HTMLinclude(oldNode, fileurl);
+
+
 
 	}
 
@@ -301,10 +311,15 @@ Template.activeInclude = () => {
 if (!Template.isLoad) {
 	document.addEventListener('DOMContentLoaded', function() {
 		console.log('document.ready');
-		Template.HTMLinclude(document);
+		//Template.HTMLinclude(document);
 	});
 }
 Template.isLoad = true;
-//Template.HTMLinclude();
+
+
+
+Template.HTMLinclude(document, document.baseURI);
+
+
 
 module.exports = Template;
