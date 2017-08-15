@@ -8,6 +8,10 @@
 const http = require('http');
 var FS = require("fs");
 const path = require('path');
+if (typeof(window.$) == 'undefined') {
+	console.error('%c $ jquery  is not ready!!!!!', 'font-size:20pt');
+	return;
+}
 
 class Template {
 	constructor() {
@@ -30,28 +34,30 @@ class Template {
 		* **/
 
 	static makeNode(tplSel, jsonData) {
-			//TODO   html模板
-			var html = $(tplSel).text();
-			//html = "<div>"+html+"</div>";
-			html = Template.applyData(html, jsonData);
+		//TODO   html模板
+		var html = $(tplSel).text();
+		//html = "<div>"+html+"</div>";
+		html = Template.applyData(html, jsonData);
 
-			return $(html);
+		return $(html);
 
-		}
-		/**
-		将某魔板应用上数据，生成html，并append到某节点上
-		**/
+	}
+
+
+	/**
+	将某魔板应用上数据，生成html，并append到某节点上
+	**/
 	static makeNodeTo(tplSel, jsonData, applySel) {
-			$(applySel).append(Template.makeNode(tplSel, jsonData));
+		$(applySel).append(Template.makeNode(tplSel, jsonData));
 
-		}
-		//20170509 新增  反向模板
+	}
+
 	static makeToNode(tplSel, jsonData, applySel) {
-			$(applySel).prepend(Template.makeNode(tplSel, jsonData));
-			//		prepend
+		$(applySel).prepend(Template.makeNode(tplSel, jsonData));
+		//		prepend
 
-		}
-		//data={x:100}
+	}
+
 	static applyData(tplTxt, data) {
 		if (typeof(Map) == 'undefined') {
 			return Template.applyData10(tplTxt, data);
@@ -86,9 +92,10 @@ class Template {
 
 		template = template
 			.replace(evalExpr, '`); \n  echo( $1 ); \n  echo(`')
-			.replace(expr, '`); \n $1 \n  echo(`');
+			.replace(expr, '`); \n $1 \n  echo(`')
+			.replace(/\$\{(.+?)\}/g, "\${data\.$1\}"); //替换旧格式
 
-		console.log(template);
+		//console.log(template);
 
 		template = 'echo(`' + template + '`);';
 
@@ -151,14 +158,20 @@ class FromEbededObject {
 
 
 class TemplateFromFile {
-	constructor(filepath, callback) {
-		this.readfile(filepath, callback);
+	constructor(filepath, code) {
+		this.code = code;
+		this.readfile(filepath);
 
 	}
-	readfile(filepath, callback) {
+	readfile(filepath) {
+		var html = '';
+		if (!FS.existsSync(filepath)) {
+			console.error("[dee-template]file not exists: " + filepath);
+			console.log(this.code);
+		} else {
+			html = FS.readFileSync(filepath, "utf-8");
+		}
 
-		//ajax 
-		var html = FS.readFileSync(filepath, "utf-8");
 
 		this.templateObj = $("<div>" + html + "</div>");
 
@@ -175,10 +188,14 @@ class TemplateFromFile {
 }
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv include 功能 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-var HTMLinclude = (scope) => {
+var HTMLinclude = (scope, basedir0) => {
 
-	for (var i = 0; i < $('include', scope).length; i++) {
-		var ele = $('include', scope).eq(i);
+	var basedir = path.dirname(basedir0.replace('file://', ''));
+
+	var selAll = $("include[loaded!='yes']", scope);
+	var selCount = selAll.length;
+	for (var i = 0; i < selCount; i++) {
+		var ele = selAll.eq(i);
 		var filepath = ele.attr('src');
 		var fileid = ele.attr('module');
 		var sel = ele.attr('node');
@@ -187,53 +204,69 @@ var HTMLinclude = (scope) => {
 
 		if (!fileid) fileid = 'i_' + Math.random();
 
+		var fileurl = '';
 		if (!HTMLinclude.maker[fileid]) {
-			let fileurl = `${path.join(window.VIEWROOT, filepath)}`;
+			if (!filepath) {
+				console.log((ele[0].outerHTML));
+			}
 
-			HTMLinclude.maker[fileid] = new TemplateFromFile(fileurl);
+			fileurl = path.join(basedir, filepath);
+			if (!FS.existsSync(fileurl)) {
+				console.error("[include]file not exist:" + fileurl);
+				return;
+			}
+
+			HTMLinclude.maker[fileid] = new TemplateFromFile(fileurl, (ele[0].outerHTML).trim());
 		}
 
 
-		if (sel) {
-			var html = '';
+		if (!sel) {
+			continue;
+		}
 
-			if (data) {
+		var html = '';
+		if (data) {
+			try {
+				html = HTMLinclude.maker[fileid].template('#' + sel, data);
+			} catch (e) {
+				console.error(e);
+				console.error(data);
+			}
+		} else {
+			html = HTMLinclude.maker[fileid].getOrignalHtml('#' + sel);
+		}
 
-				try {
-					html = HTMLinclude.maker[fileid].template('#' + sel, data);
 
-				} catch (e) {
-					console.error(e);
-					console.error(data);
-				}
+		var oldNode = ele.get(0);
+		oldNode.innerHTML = html;
+		oldNode.setAttribute('loaded', 'yes');
 
+		if (script) {
+			var moduleID = ('M' + Math.random()).replace('0.', '');
+			if (!oldNode.id) {
+				oldNode.id = moduleID;
 			} else {
-				html = HTMLinclude.maker[fileid].getOrignalHtml('#' + sel);
+				moduleID = oldNode.id;
 			}
 
-
-
-			if (!script) {
-				ele.get(0).outerHTML = html;
-			} else {
-				var moduleID = ('M' + Math.random()).replace('0.', '');
-				ele.get(0).outerHTML = `<MODULE id='${moduleID}'>${html}</MODULE>`;
-
-				let fileurl = `${path.join(window.ROOT, script)}`;
-
-				var localScript = require(fileurl);
-
-
-				new localScript(function(a) {
-					return window.$(a, $('#' + moduleID));
-				});
-
-
+			let jsurl = path.join(basedir, script);
+			if (!FS.existsSync(jsurl) && !FS.existsSync(jsurl+'.js')) {
+				console.error("[include]file not exist:" + jsurl);
+				return;
 			}
-			//execute script first OR fill html ?
-			Template.HTMLinclude(document);
+
+			var localScript = require(jsurl);
+
+			oldNode.runtime = new localScript(function(a) {
+				return window.$(a, window.$('#' + moduleID));
+			});
 
 		}
+
+		//execute script first OR fill html ?
+		Template.HTMLinclude(oldNode, fileurl);
+
+
 
 	}
 
@@ -286,10 +319,15 @@ Template.activeInclude = () => {
 if (!Template.isLoad) {
 	document.addEventListener('DOMContentLoaded', function() {
 		console.log('document.ready');
-		Template.HTMLinclude(document);
+		//Template.HTMLinclude(document);
 	});
 }
 Template.isLoad = true;
-//Template.HTMLinclude();
+
+
+
+Template.HTMLinclude(document, document.baseURI);
+
+
 
 module.exports = Template;
