@@ -211,6 +211,10 @@ var HTMLinclude = (scope, basedir0) => {
 			}
 
 			fileurl = path.join(basedir, filepath);
+			if (!FS.existsSync(fileurl)) {
+				console.error("[include]file not exist:" + fileurl);
+				return;
+			}
 
 			HTMLinclude.maker[fileid] = new TemplateFromFile(fileurl, (ele[0].outerHTML).trim());
 		}
@@ -246,6 +250,10 @@ var HTMLinclude = (scope, basedir0) => {
 			}
 
 			let jsurl = path.join(basedir, script);
+			if (!FS.existsSync(jsurl) && !FS.existsSync(jsurl+'.js')) {
+				console.error("[include]file not exist:" + jsurl);
+				return;
+			}
 
 			var localScript = require(jsurl);
 
