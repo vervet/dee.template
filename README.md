@@ -206,9 +206,9 @@ class MyModule  {
   }
   publicMethod (){
      //公开的函数
-     //使用方法，见下文
+     //使用方法，见下文
   }
-} 
+} //class
 function myOldCode($){
     //all my old code
 }
