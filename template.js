@@ -188,9 +188,11 @@ class TemplateFromFile {
 }
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv include 功能 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-var HTMLinclude = (scope, basedir0) => {
+var HTMLinclude = (scope, baseURI) => {
+	var basedir = path.join(baseURI).replace(path.sep == '/' ? 'file:' : 'file:\\', '');
 
-	var basedir = path.dirname(basedir0.replace('file://', ''));
+	basedir = path.dirname(basedir);
+
 
 	var selAll = $("include[loaded!='yes']", scope);
 	var selCount = selAll.length;
@@ -217,6 +219,7 @@ var HTMLinclude = (scope, basedir0) => {
 			}
 
 			HTMLinclude.maker[fileid] = new TemplateFromFile(fileurl, (ele[0].outerHTML).trim());
+			HTMLinclude.maker[fileid]._htmlfile = fileurl;
 		}
 
 
@@ -250,23 +253,29 @@ var HTMLinclude = (scope, basedir0) => {
 			}
 
 			let jsurl = path.join(basedir, script);
-			if (!FS.existsSync(jsurl) && !FS.existsSync(jsurl+'.js')) {
+
+			runJs(oldNode, jsurl);
+
+		}
+
+		//execute script first OR fill html ?
+		if (!fileurl) {
+			fileurl = HTMLinclude.maker[fileid]._htmlfile;
+		}
+		Template.HTMLinclude(oldNode, fileurl);
+
+		//执行代码
+		function runJs(oldNode, jsurl) {
+			if (!FS.existsSync(jsurl) && !FS.existsSync(jsurl + '.js')) {
 				console.error("[include]file not exist:" + jsurl);
 				return;
 			}
 
 			var localScript = require(jsurl);
-
 			oldNode.runtime = new localScript(function(a) {
-				return window.$(a, window.$('#' + moduleID));
+				return window.$(a, oldNode); //window.$('#' + moduleID));
 			});
-
 		}
-
-		//execute script first OR fill html ?
-		Template.HTMLinclude(oldNode, fileurl);
-
-
 
 	}
 
@@ -324,10 +333,9 @@ if (!Template.isLoad) {
 }
 Template.isLoad = true;
 
-
+module.exports = Template;
 
 Template.HTMLinclude(document, document.baseURI);
 
 
 
-module.exports = Template;
