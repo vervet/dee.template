@@ -165,7 +165,7 @@ class TemplateFromFile {
 	}
 	readfile(filepath) {
 		var html = '';
-		if (!FS.existsSync(filepath)) {
+		if (!fileExistsSync(filepath)) {
 			console.error("[dee-template]file not exists: " + filepath);
 			console.log(this.code);
 		} else {
@@ -187,6 +187,10 @@ class TemplateFromFile {
 
 }
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv include 功能 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+function fileExistsSync(path) {
+	var path0 = decodeURI(path);
+	return FS.existsSync(path0);
+}
 
 var HTMLinclude = (scope, baseURI) => {
 	var basedir = path.join(baseURI).replace(path.sep == '/' ? 'file:' : 'file:\\', '');
@@ -213,7 +217,7 @@ var HTMLinclude = (scope, baseURI) => {
 			}
 
 			fileurl = path.join(basedir, filepath);
-			if (!FS.existsSync(fileurl)) {
+			if (!fileExistsSync(fileurl)) {
 				console.error("[include]file not exist:" + fileurl);
 				return;
 			}
@@ -266,7 +270,7 @@ var HTMLinclude = (scope, baseURI) => {
 
 		//执行代码
 		function runJs(oldNode, jsurl) {
-			if (!FS.existsSync(jsurl) && !FS.existsSync(jsurl + '.js')) {
+			if (!fileExistsSync(jsurl) && !fileExistsSync(jsurl + '.js')) {
 				console.error("[include]file not exist:" + jsurl);
 				return;
 			}
@@ -336,6 +340,3 @@ Template.isLoad = true;
 module.exports = Template;
 
 Template.HTMLinclude(document, document.baseURI);
-
-
-
