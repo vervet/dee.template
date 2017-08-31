@@ -1,4 +1,4 @@
-HTML模板引擎
+ HTML模板引擎
 
 ## 支持特性
 1. 根据页面内嵌节点作为模板
@@ -217,10 +217,26 @@ module.exports = MyModule;
 ```
 
 ```js
-
+//调用公共函数
 $('include')[0].runtime.publicMethod();
 //访问节点的类实例的函数
 
+```
+```js
+//绑定自定义事件
+$('include')[0].runtime.on('myevent',function(param){
+    //.....
+})
+
+
+//类内部触发事件
+this.trigger('myevent',123);
+//或  
+this.myevent.trigger(123);
+//或从外部触发
+$('include')[0].runtime.trigger('myevent',123);
+//或
+$('include')[0].runtime.myevent.trigger(123)
 ```
 
 **data应用：**

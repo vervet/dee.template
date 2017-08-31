@@ -276,6 +276,10 @@ var HTMLinclude = (scope, baseURI) => {
 			oldNode.runtime = new localScript(function(a) {
 				return window.$(a, oldNode); //window.$('#' + moduleID));
 			});
+			//用法 $('.abc').runtime.myPublicFunction(2121);
+			EventFactory.on(oldNode.runtime); //
+			//用法  $('.abc').runtime.on('myevent',function(){ ...})
+			//触发、: $('.abc').runtime.myevent.trigger(123); OR  $('.abc').runtime.trigger('myevent',123);
 		}
 
 	}
@@ -312,6 +316,71 @@ module.exports = VIP;
 */
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+
+class EventFactory {
+	static make(obj, ev) {
+		obj[ev] = (fn) => {
+			obj[ev]['_fnlist'].push(fn);
+		}
+		obj[ev]['_fnlist'] = []; //call back list
+		obj[ev]['trigger'] = (d) => {
+			for (var i in obj[ev]['_fnlist']) {
+				var fn = obj[ev]['_fnlist'][i];
+				fn(d);
+			}
+		}
+		obj[ev]['destroy'] = () => {
+			EventFactory.destroy(obj, ev);
+		}
+
+		EventFactory.on(obj);
+	}
+	static on(obj) { //未知事件绑定
+		if (obj.on == undefined) {
+			obj.on = (ev, func) => {
+				if (obj[ev] == undefined) {
+					EventFactory.make(obj, ev);
+				}
+				obj[ev](func);
+			}
+			obj.trigger = (ev, data) => {
+				if (obj[ev] != undefined && obj[ev]['trigger'] != undefined) {
+					obj[ev]['trigger'](data);
+				}
+
+			}
+		}
+	}
+
+	static destroy(obj, ev) {
+		obj[ev]['_fnlist'] = [];
+	}
+
+}
+/**  事件发生器
+  如下是在include所使用的class内
+
+  class myscope{
+	constructor(){
+	   EventFactory.make(this,'iamready');  //定义事件
+	}
+	somewhere(){
+	  this.iamready.trigger(123); //触发事件
+	}
+  }
+
+ //<include id='obj' src="xxx.html" script="myscope.js" ...>
+
+ //另外一个模块，事件接受者
+ $('#obj').runtime.iamready((param)=>{
+	
+ });
+
+
+*/
+
+
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 //激活HTML里的include标签
