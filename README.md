@@ -1,4 +1,4 @@
-HTML模板引擎
+ HTML模板引擎
 
 ## 支持特性
 1. 根据页面内嵌节点作为模板
@@ -176,7 +176,7 @@ include 功能的深度嵌入
 ```js
  无
 ```
-### include标签的属性 
+## 4.1 include标签的属性 
 属性 | 说明
 ---|---
 src | 所嵌入的html代码所在文件名
@@ -189,13 +189,13 @@ script| 需要执行的代码 (书写规则另见)
 可以参考include功能的举例2，先将模板文件实例化，再分别使用各子模板
 
 
-### 支持循环嵌套
+## 4.2 支持循环嵌套
 
 include 支持循环嵌套
 
-### 支持运行js代码
+## 4.3 支持运行js代码
 
-include 内嵌代码书写规则举例
+script 指向模块需要运行的内嵌代码，规则举例
 ```js
 class MyModule  {
   constructor($) { 
@@ -216,14 +216,33 @@ module.exports = MyModule;
 
 ```
 
+### 4.3.1 调用公共函数
 ```js
-
+//调用公共函数
 $('include')[0].runtime.publicMethod();
 //访问节点的类实例的函数
 
 ```
+### 4.3.2 绑定自定义事件
+```js
+//绑定自定义事件
+$('include')[0].runtime.on('myevent',function(param){
+    //.....
+})
+```
+### 4.3.3 触发自定义事件
+```js
+//类内部触发事件
+this.trigger('myevent',123);
+//或  
+this.myevent.trigger(123);
+//或从外部触发
+$('include')[0].runtime.trigger('myevent',123);
+//或
+$('include')[0].runtime.myevent.trigger(123)
+```
 
-**data应用：**
+**data 属性应用：**
 > 没有node值的include标签不会被实例化，
 可以为该节点设置 node, data, module,甚至src 后，
 使用activeInclude方法，动态激活该标签
@@ -242,7 +261,30 @@ Template.activeInclude(
 );
 ```
 
+## 4.4 事件制造器 Template.EventFactory
+```js
+Template.EventFactory(obj, event)
+```
+```js
+//为对象声明事件
+Template.EventFactory(mainObj, 'myevent');
 
+//触发事件
+mainObj.myevent.trigger(111);
+
+```
+
+使用者
+```js
+mainObj.myevent(function(param){
+ //接收到参数
+
+});
+ 
+
+```
+ 
+ 
 # Thank you!
 
  
