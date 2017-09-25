@@ -381,7 +381,7 @@ class EventFactory {
 
 
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+Template.EventFactory =EventFactory;
 
 //激活HTML里的include标签
 Template.HTMLinclude = HTMLinclude;
